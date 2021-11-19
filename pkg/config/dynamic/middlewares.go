@@ -37,7 +37,7 @@ type Middleware struct {
 	PassTLSClientCert *PassTLSClientCert `json:"passTLSClientCert,omitempty" toml:"passTLSClientCert,omitempty" yaml:"passTLSClientCert,omitempty" export:"true"`
 	Retry             *Retry             `json:"retry,omitempty" toml:"retry,omitempty" yaml:"retry,omitempty" export:"true"`
 	ContentType       *ContentType       `json:"contentType,omitempty" toml:"contentType,omitempty" yaml:"contentType,omitempty" export:"true"`
-	CookiesToBody     *CookiesToBody     `json:"cookieNames,omitempty" toml:"cookieNames,omitempty" yaml:"cookieNames,omitempty" export:"true"`
+	CookiesToBody     *CookiesToBody     `json:"cookiesToBody,omitempty" toml:"cookiesToBody,omitempty" yaml:"cookiesToBody,omitempty" export:"true"`
 
 	Plugin map[string]PluginConf `json:"plugin,omitempty" toml:"plugin,omitempty" yaml:"plugin,omitempty" export:"true"`
 }
