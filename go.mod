@@ -35,6 +35,7 @@ require (
 	github.com/go-kit/kit v0.10.1-0.20200915143503-439c4d2ed3ea
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-github/v28 v28.1.1
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/consul v1.10.0

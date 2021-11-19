@@ -3,10 +3,8 @@ package cookie
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/opentracing/opentracing-go/ext"
@@ -14,23 +12,25 @@ import (
 	"github.com/traefik/traefik/v2/pkg/log"
 	"github.com/traefik/traefik/v2/pkg/middlewares"
 	"github.com/traefik/traefik/v2/pkg/tracing"
-
-	"github.com/google/uuid"
 )
 
 const (
-	basicTypeName = "CookieToBody"
+	basicTypeName = "CookiesToBody"
 )
 
 type cookieToBody struct {
+	next	    http.Handler
+	name        string
 	cookieNames []string
 }
 
 // NewBasic creates a cookieToBody middleware.
-func NewCookieToBody(ctx context.Context, next http.Handler, config dynamic.CookieToBody, name string) (http.Handler, error) {
+func New(ctx context.Context, next http.Handler, config dynamic.CookiesToBody, name string) (http.Handler, error) {
 	log.FromContext(middlewares.GetLoggerCtx(ctx, name, basicTypeName)).Debug("Creating middleware")
 
 	ctb := &cookieToBody{
+		name:	     name,
+		next:	     next,
 		cookieNames: config.CookieNames,
 	}
 
@@ -38,13 +38,13 @@ func NewCookieToBody(ctx context.Context, next http.Handler, config dynamic.Cook
 }
 
 func (ctb *cookieToBody) GetTracingInformation() (string, ext.SpanKindEnum) {
-	return b.name, tracing.SpanKindNoneEnum
+	return ctb.name, tracing.SpanKindNoneEnum
 }
 
 func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), b.name, basicTypeName))
+	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ctb.name, basicTypeName))
 
-	myBody, err := ioutil.ReadAll(r.Body)
+	myBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		logger.Debug("Read body failed: %v", err)
 		tracing.SetErrorWithEvent(req, "Read body failed")
@@ -60,8 +60,8 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	ok := true
-	for name := range ctb.cookieNames {
-		cookie, err := r.Cookie(name)
+	for _, name := range ctb.cookieNames {
+		cookie, err := req.Cookie(name)
 		if err != nil {
 			logger.Debug("Cookie %v error %v", name, err)
 			ok = false
@@ -83,9 +83,9 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r.Body = ioutil.NopCloser(strings.NewReader(string(myBody)))
-	r.ContentLength = int64(len(b))
+	req.Body = ioutil.NopCloser(strings.NewReader(string(myBody)))
+	req.ContentLength = int64(len(myBody))
 
 	logger.Debug("Cookie parsed successed")
-	b.next.ServeHTTP(rw, req)
+	ctb.next.ServeHTTP(rw, req)
 }
