@@ -45,6 +45,7 @@ type MiddlewareSpec struct {
 	PassTLSClientCert *dynamic.PassTLSClientCert     `json:"passTLSClientCert,omitempty"`
 	Retry             *Retry                         `json:"retry,omitempty"`
 	ContentType       *dynamic.ContentType           `json:"contentType,omitempty"`
+	CookiesToBody     *dynamic.CookiesToBody         `json:"cookiesToBody,omitempty"`
 	Plugin            map[string]apiextensionv1.JSON `json:"plugin,omitempty"`
 }
 

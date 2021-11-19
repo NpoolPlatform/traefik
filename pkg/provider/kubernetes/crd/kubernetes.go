@@ -262,6 +262,7 @@ func (p *Provider) loadConfigurationFromCRD(ctx context.Context, client Client) 
 			PassTLSClientCert: middleware.Spec.PassTLSClientCert,
 			Retry:             retry,
 			ContentType:       middleware.Spec.ContentType,
+			CookiesToBody:     middleware.Spec.CookiesToBody,
 			Plugin:            plugin,
 		}
 	}
