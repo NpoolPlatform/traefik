@@ -1,4 +1,4 @@
-package auth
+package cookie
 
 import (
 	"context"
