@@ -513,8 +513,3 @@ func (c *ClientTLS) CreateTLSConfig() (*tls.Config, error) {
 type CookiesToBody struct {
 	CookieNames []string `json:"cookieNames,omitempty" toml:"cookieNames,omitempty" yaml:"cookieNames,omitempty" export:"true"`
 }
-
-// +k8s:deepcopy-gen=true
-
-// Users holds a list of users.
-type Users []string
