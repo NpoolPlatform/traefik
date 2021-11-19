@@ -37,6 +37,7 @@ type Middleware struct {
 	PassTLSClientCert *PassTLSClientCert `json:"passTLSClientCert,omitempty" toml:"passTLSClientCert,omitempty" yaml:"passTLSClientCert,omitempty" export:"true"`
 	Retry             *Retry             `json:"retry,omitempty" toml:"retry,omitempty" yaml:"retry,omitempty" export:"true"`
 	ContentType       *ContentType       `json:"contentType,omitempty" toml:"contentType,omitempty" yaml:"contentType,omitempty" export:"true"`
+	CookiesToBody     *CookiesToBody     `json:"cookieNames,omitempty" toml:"cookieNames,omitempty" yaml:"cookieNames,omitempty" export:"true"`
 
 	Plugin map[string]PluginConf `json:"plugin,omitempty" toml:"plugin,omitempty" yaml:"plugin,omitempty" export:"true"`
 }
@@ -505,3 +506,15 @@ func (c *ClientTLS) CreateTLSConfig() (*tls.Config, error) {
 		ClientAuth:         clientAuth,
 	}, nil
 }
+
+// +k8s:deepcopy-gen=true
+
+// CookiesToBody holds the CookiesToBody configuration.
+type CookiesToBody struct {
+	CookieNames []string `json:"cookieNames,omitempty" toml:"cookieNames,omitempty" yaml:"cookieNames,omitempty" export:"true"`
+}
+
+// +k8s:deepcopy-gen=true
+
+// Users holds a list of users.
+type Users []string

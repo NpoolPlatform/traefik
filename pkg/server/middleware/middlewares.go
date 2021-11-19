@@ -15,6 +15,7 @@ import (
 	"github.com/traefik/traefik/v2/pkg/middlewares/chain"
 	"github.com/traefik/traefik/v2/pkg/middlewares/circuitbreaker"
 	"github.com/traefik/traefik/v2/pkg/middlewares/compress"
+	"github.com/traefik/traefik/v2/pkg/middlewares/cookie"
 	"github.com/traefik/traefik/v2/pkg/middlewares/customerrors"
 	"github.com/traefik/traefik/v2/pkg/middlewares/headers"
 	"github.com/traefik/traefik/v2/pkg/middlewares/inflightreq"
@@ -336,6 +337,17 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 		}
 		middleware = func(next http.Handler) (http.Handler, error) {
 			return stripprefixregex.New(ctx, next, *config.StripPrefixRegex, middlewareName)
+		}
+	}
+
+	// CookiesToBody
+	if config.CookiesToBody != nil {
+		if middleware != nil {
+			return nil, badConf
+		}
+
+		middleware = func(next http.Handler) (http.Handler, error) {
+			return cookie.New(ctx, next, *config.CookiesToBody, middlewareName)
 		}
 	}
 
