@@ -17,6 +17,7 @@ TRAEFIK_IMAGE := $(if $(REPONAME),$(REPONAME),"traefik/traefik")
 
 INTEGRATION_OPTS := $(if $(MAKE_DOCKER_HOST),-e "DOCKER_HOST=$(MAKE_DOCKER_HOST)", -e "TEST_CONTAINER=1" -v "/var/run/docker.sock:/var/run/docker.sock")
 DOCKER_BUILD_ARGS := $(if $(DOCKER_VERSION), "--build-arg=DOCKER_VERSION=$(DOCKER_VERSION)",)
+DOCKER_BUILD_ARGS += "--build-arg=ALL_PROXY=${all_proxy}"
 
 TRAEFIK_ENVS := \
 	-e OS_ARCH_ARG \
@@ -33,6 +34,7 @@ TRAEFIK_MOUNT := -v "$(CURDIR)/$(BIND_DIR):/go/src/github.com/traefik/traefik/$(
 DOCKER_RUN_OPTS := $(TRAEFIK_ENVS) $(TRAEFIK_MOUNT) "$(TRAEFIK_DEV_IMAGE)"
 DOCKER_NON_INTERACTIVE ?= false
 DOCKER_RUN_TRAEFIK := docker run --add-host=host.docker.internal:127.0.0.1 $(INTEGRATION_OPTS) $(if $(DOCKER_NON_INTERACTIVE), , -it) $(DOCKER_RUN_OPTS)
+DOCKER_BUILD_RUN_TRAEFIK := docker run --add-host=host.docker.internal:127.0.0.1 $(INTEGRATION_OPTS) $(if $(DOCKER_NON_INTERACTIVE), , -it) -e GO111MODULE=on -e GOPROXY=https://goproxy.cn,direct --name traefik-build-dev $(DOCKER_RUN_OPTS)
 DOCKER_RUN_TRAEFIK_NOTTY := docker run $(INTEGRATION_OPTS) $(if $(DOCKER_NON_INTERACTIVE), , -i) $(DOCKER_RUN_OPTS)
 
 PRE_TARGET ?= build-dev-image
@@ -70,6 +72,12 @@ generate-webui:
 ## Build the linux binary
 binary: generate-webui $(PRE_TARGET)
 	$(if $(PRE_TARGET),$(DOCKER_RUN_TRAEFIK)) ./script/make.sh generate binary
+
+traefik-binary: $(PRE_TARGET)
+	$(if $(PRE_TARGET),$(DOCKER_BUILD_RUN_TRAEFIK)) go build -o /go/src/github.com/traefik/traefik/$(BIND_DIR)/traefik /go/src/github.com/traefik/traefik/cmd/traefik
+	docker cp traefik-build-dev:/go/src/github.com/traefik/traefik/$(BIND_DIR)/traefik ./dist/traefik
+	docker rm traefik-build-dev
+	docker rmi ${TRAEFIK_DEV_IMAGE}
 
 ## Build the binary for the standard platforms (linux, darwin, windows)
 crossbinary-default: generate-webui build-dev-image

@@ -1,5 +1,10 @@
 FROM golang:1.17-alpine
 
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+
+ARG ALL_PROXY
+ENV all_proxy=$ALL_PROXY
+
 RUN apk --update upgrade \
     && apk --no-cache --no-progress add git mercurial bash gcc musl-dev curl tar ca-certificates tzdata \
     && update-ca-certificates \
@@ -32,6 +37,9 @@ WORKDIR /go/src/github.com/traefik/traefik
 # Download go modules
 COPY go.mod .
 COPY go.sum .
-RUN GO111MODULE=on GOPROXY=https://proxy.golang.org go mod download
+RUN GO111MODULE=on GOPROXY=https://goproxy.cn,direct go mod download
 
 COPY . /go/src/github.com/traefik/traefik
+RUN mkdir /go/src/github.com/traefik/traefik/dist -p
+
+RUN GOPROXY=https://goproxy.cn,direct go generate
