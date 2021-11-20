@@ -67,6 +67,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			logger.Warnf("Cookie %v error %v", name, err)
 			ok = false
+			continue
 		}
 
 		bodyMap[cookie.Name] = cookie.Value
