@@ -52,11 +52,13 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	bodyMap := map[string]interface{}{}
-	err = json.Unmarshal(myBody, &bodyMap)
-	if err != nil {
-		logger.Warnf("Unmarshal body failed: %v", err)
-		tracing.SetErrorWithEvent(req, "Unmarshal body failed")
-		return
+	if len(myBody) > 0 {
+		err = json.Unmarshal(myBody, &bodyMap)
+		if err != nil {
+			logger.Warnf("Unmarshal body failed: %v", err)
+			tracing.SetErrorWithEvent(req, "Unmarshal body failed")
+			return
+		}
 	}
 
 	ok := true
