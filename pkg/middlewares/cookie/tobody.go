@@ -46,7 +46,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	myBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		logger.Debug("Read body failed: %v", err)
+		logger.Warnf("Read body failed: %v", err)
 		tracing.SetErrorWithEvent(req, "Read body failed")
 		return
 	}
@@ -54,7 +54,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	bodyMap := map[string]interface{}{}
 	err = json.Unmarshal(myBody, &bodyMap)
 	if err != nil {
-		logger.Debug("Unmarshal body failed: %v", err)
+		logger.Warnf("Unmarshal body failed: %v", err)
 		tracing.SetErrorWithEvent(req, "Unmarshal body failed")
 		return
 	}
@@ -63,7 +63,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	for _, name := range ctb.cookieNames {
 		cookie, err := req.Cookie(name)
 		if err != nil {
-			logger.Debug("Cookie %v error %v", name, err)
+			logger.Warnf("Cookie %v error %v", name, err)
 			ok = false
 		}
 
@@ -71,14 +71,14 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if !ok {
-		logger.Debug("Cookie parse failed")
+		logger.Warnf("Cookie parse failed")
 		tracing.SetErrorWithEvent(req, "Cookie parse failed")
 		return
 	}
 
 	myBody, err = json.Marshal(&bodyMap)
 	if err != nil {
-		logger.Debug("Marshal body failed: %v", err)
+		logger.Warnf("Marshal body failed: %v", err)
 		tracing.SetErrorWithEvent(req, "Marshal body failed")
 		return
 	}
@@ -86,6 +86,6 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	req.Body = ioutil.NopCloser(strings.NewReader(string(myBody)))
 	req.ContentLength = int64(len(myBody))
 
-	logger.Debug("Cookie parsed successed")
+	logger.("Cookie parsed successed")
 	ctb.next.ServeHTTP(rw, req)
 }
