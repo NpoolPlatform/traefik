@@ -86,6 +86,6 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	req.Body = ioutil.NopCloser(strings.NewReader(string(myBody)))
 	req.ContentLength = int64(len(myBody))
 
-	logger.("Cookie parsed successed")
+	logger.Debug("Cookie parsed successed")
 	ctb.next.ServeHTTP(rw, req)
 }
