@@ -48,6 +48,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		logger.Warnf("Read body failed: %v", err)
 		tracing.SetErrorWithEvent(req, "Read body failed")
+		rw.WriteHeader(http.StatusForbidden)
 		return
 	}
 
@@ -57,6 +58,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			logger.Warnf("Unmarshal body failed: %v", err)
 			tracing.SetErrorWithEvent(req, "Unmarshal body failed")
+			rw.WriteHeader(http.StatusForbidden)
 			return
 		}
 	}
@@ -76,6 +78,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if !ok {
 		logger.Warnf("Cookie parse failed")
 		tracing.SetErrorWithEvent(req, "Cookie parse failed")
+		rw.WriteHeader(http.StatusForbidden)
 		return
 	}
 
@@ -83,6 +86,7 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		logger.Warnf("Marshal body failed: %v", err)
 		tracing.SetErrorWithEvent(req, "Marshal body failed")
+		rw.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
