@@ -22,4 +22,10 @@ func NewRBAC(ctx context.Context, next http.Handler, config dynamic.RBACAuth, na
 }
 
 func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	// TODO: check app exist
+	// TODO: check user exist
+	// TODO: check user login
+	// TODO: check user session
+	// TODO: check user permission
+	fa.next.ServeHTTP(rw, req)
 }
