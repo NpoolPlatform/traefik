@@ -38,6 +38,7 @@ type Middleware struct {
 	Retry             *Retry             `json:"retry,omitempty" toml:"retry,omitempty" yaml:"retry,omitempty" export:"true"`
 	ContentType       *ContentType       `json:"contentType,omitempty" toml:"contentType,omitempty" yaml:"contentType,omitempty" export:"true"`
 	HeadersToBody     *HeadersToBody     `json:"headersToBody,omitempty" toml:"headersToBody,omitempty" yaml:"headersToBody,omitempty" export:"true"`
+	RBACAuth          *RBACAuth          `json:"rbacAuth,omitempty" toml:"rbacAuth,omitempty" yaml:"rbacAuth,omitempty" export: "true"`
 
 	Plugin map[string]PluginConf `json:"plugin,omitempty" toml:"plugin,omitempty" yaml:"plugin,omitempty" export:"true"`
 }
@@ -512,4 +513,10 @@ func (c *ClientTLS) CreateTLSConfig() (*tls.Config, error) {
 // HeadersToBody holds the HeadersToBody configuration.
 type HeadersToBody struct {
 	HeaderNames []string `json:"headerNames,omitempty" toml:"headerNames,omitempty" yaml:"headerNames,omitempty" export:"true"`
+}
+
+// +k8s:deepcopy-gen=true
+
+// RBACAuth holds the RBACAuth configuration.
+type RBACAuth struct {
 }

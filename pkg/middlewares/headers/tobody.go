@@ -25,7 +25,7 @@ type headersToBody struct {
 }
 
 // NewBasic creates a headersToBody middleware.
-func New(ctx context.Context, next http.Handler, config dynamic.HeadersToBody, name string) (http.Handler, error) {
+func NewHeadersToBody(ctx context.Context, next http.Handler, config dynamic.HeadersToBody, name string) (http.Handler, error) {
 	log.FromContext(middlewares.GetLoggerCtx(ctx, name, basicTypeName)).Debug("Creating middleware")
 
 	ctb := &headersToBody{
@@ -65,9 +65,9 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	ok := true
 	for _, name := range ctb.headerNames {
-		header, err := req.Header.Get(name)
-		if err != nil {
-			logger.Warnf("fail get header %v: %v", name, err)
+		header := req.Header.Get(name)
+		if header == "" {
+			logger.Warnf("fail get header %v", name)
 			ok = false
 			continue
 		}

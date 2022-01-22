@@ -727,9 +727,14 @@ func (in *MiddlewareSpec) DeepCopyInto(out *MiddlewareSpec) {
 		*out = new(dynamic.ContentType)
 		**out = **in
 	}
-	if in.CookiesToBody != nil {
-		in, out := &in.CookiesToBody, &out.CookiesToBody
-		*out = new(dynamic.CookiesToBody)
+	if in.HeadersToBody != nil {
+		in, out := &in.HeadersToBody, &out.HeadersToBody
+		*out = new(dynamic.HeadersToBody)
+		**out = **in
+	}
+	if in.RBACAuth != nil {
+		in, out := &in.RBACAuth, &out.RBACAuth
+		*out = new(dynamic.RBACAuth)
 		**out = **in
 	}
 	if in.Plugin != nil {
