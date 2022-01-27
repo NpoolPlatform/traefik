@@ -15,7 +15,6 @@ import (
 	"github.com/traefik/traefik/v2/pkg/middlewares/chain"
 	"github.com/traefik/traefik/v2/pkg/middlewares/circuitbreaker"
 	"github.com/traefik/traefik/v2/pkg/middlewares/compress"
-	"github.com/traefik/traefik/v2/pkg/middlewares/cookie"
 	"github.com/traefik/traefik/v2/pkg/middlewares/customerrors"
 	"github.com/traefik/traefik/v2/pkg/middlewares/headers"
 	"github.com/traefik/traefik/v2/pkg/middlewares/inflightreq"
@@ -340,14 +339,25 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 		}
 	}
 
-	// CookiesToBody
-	if config.CookiesToBody != nil {
+	// HeadersToBody
+	if config.HeadersToBody != nil {
 		if middleware != nil {
 			return nil, badConf
 		}
 
 		middleware = func(next http.Handler) (http.Handler, error) {
-			return cookie.New(ctx, next, *config.CookiesToBody, middlewareName)
+			return headers.NewHeadersToBody(ctx, next, *config.HeadersToBody, middlewareName)
+		}
+	}
+
+	// RBACAuth
+	if config.RBACAuth != nil {
+		if middleware != nil {
+			return nil, badConf
+		}
+
+		middleware = func(next http.Handler) (http.Handler, error) {
+			return auth.NewRBAC(ctx, next, *config.RBACAuth, middlewareName)
 		}
 	}
 

@@ -37,7 +37,8 @@ type Middleware struct {
 	PassTLSClientCert *PassTLSClientCert `json:"passTLSClientCert,omitempty" toml:"passTLSClientCert,omitempty" yaml:"passTLSClientCert,omitempty" export:"true"`
 	Retry             *Retry             `json:"retry,omitempty" toml:"retry,omitempty" yaml:"retry,omitempty" export:"true"`
 	ContentType       *ContentType       `json:"contentType,omitempty" toml:"contentType,omitempty" yaml:"contentType,omitempty" export:"true"`
-	CookiesToBody     *CookiesToBody     `json:"cookiesToBody,omitempty" toml:"cookiesToBody,omitempty" yaml:"cookiesToBody,omitempty" export:"true"`
+	HeadersToBody     *HeadersToBody     `json:"headersToBody,omitempty" toml:"headersToBody,omitempty" yaml:"headersToBody,omitempty" export:"true"`
+	RBACAuth          *RBACAuth          `json:"rbacAuth,omitempty" toml:"rbacAuth,omitempty" yaml:"rbacAuth,omitempty" export: "true"`
 
 	Plugin map[string]PluginConf `json:"plugin,omitempty" toml:"plugin,omitempty" yaml:"plugin,omitempty" export:"true"`
 }
@@ -509,7 +510,14 @@ func (c *ClientTLS) CreateTLSConfig() (*tls.Config, error) {
 
 // +k8s:deepcopy-gen=true
 
-// CookiesToBody holds the CookiesToBody configuration.
-type CookiesToBody struct {
-	CookieNames []string `json:"cookieNames,omitempty" toml:"cookieNames,omitempty" yaml:"cookieNames,omitempty" export:"true"`
+// HeadersToBody holds the HeadersToBody configuration.
+type HeadersToBody struct {
+	HeaderNames []string `json:"headerNames,omitempty" toml:"headerNames,omitempty" yaml:"headerNames,omitempty" export:"true"`
+}
+
+// +k8s:deepcopy-gen=true
+
+// RBACAuth holds the RBACAuth configuration.
+type RBACAuth struct {
+	HeaderNames []string `json:"headerNames,omitempty" toml:"headerNames,omitempty" yaml:"headerNames,omitempty" export:"true"`
 }

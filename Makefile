@@ -174,6 +174,7 @@ fmt:
 	gofmt -s -l -w $(SRCS)
 
 run-dev:
+	GO111MODULE=off go get -u github.com/containous/go-bindata/...
 	go generate
 	GO111MODULE=on go build ./cmd/traefik
 	./traefik

@@ -1,4 +1,4 @@
-package cookie
+package headers
 
 import (
 	"context"
@@ -15,33 +15,33 @@ import (
 )
 
 const (
-	basicTypeName = "CookiesToBody"
+	basicTypeName = "HeadersToBody"
 )
 
-type cookieToBody struct {
-	next	    http.Handler
+type headersToBody struct {
+	next        http.Handler
 	name        string
-	cookieNames []string
+	headerNames []string
 }
 
-// NewBasic creates a cookieToBody middleware.
-func New(ctx context.Context, next http.Handler, config dynamic.CookiesToBody, name string) (http.Handler, error) {
+// NewBasic creates a headersToBody middleware.
+func NewHeadersToBody(ctx context.Context, next http.Handler, config dynamic.HeadersToBody, name string) (http.Handler, error) {
 	log.FromContext(middlewares.GetLoggerCtx(ctx, name, basicTypeName)).Debug("Creating middleware")
 
-	ctb := &cookieToBody{
-		name:	     name,
-		next:	     next,
-		cookieNames: config.CookieNames,
+	ctb := &headersToBody{
+		name:        name,
+		next:        next,
+		headerNames: config.HeaderNames,
 	}
 
 	return ctb, nil
 }
 
-func (ctb *cookieToBody) GetTracingInformation() (string, ext.SpanKindEnum) {
+func (ctb *headersToBody) GetTracingInformation() (string, ext.SpanKindEnum) {
 	return ctb.name, tracing.SpanKindNoneEnum
 }
 
-func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ctb.name, basicTypeName))
 
 	myBody, err := ioutil.ReadAll(req.Body)
@@ -64,20 +64,20 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	ok := true
-	for _, name := range ctb.cookieNames {
-		cookie, err := req.Cookie(name)
-		if err != nil {
-			logger.Warnf("Cookie %v error %v", name, err)
+	for _, name := range ctb.headerNames {
+		header := req.Header.Get(name)
+		if header == "" {
+			logger.Warnf("fail get header %v", name)
 			ok = false
 			continue
 		}
 
-		bodyMap[cookie.Name] = cookie.Value
+		bodyMap[name] = header
 	}
 
 	if !ok {
-		logger.Warnf("Cookie parse failed")
-		tracing.SetErrorWithEvent(req, "Cookie parse failed")
+		logger.Warnf("header parse failed")
+		tracing.SetErrorWithEvent(req, "header parse failed")
 		rw.WriteHeader(http.StatusForbidden)
 		return
 	}
@@ -93,6 +93,6 @@ func (ctb *cookieToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	req.Body = ioutil.NopCloser(strings.NewReader(string(myBody)))
 	req.ContentLength = int64(len(myBody))
 
-	logger.Debug("Cookie parsed successed")
+	logger.Debug("header parsed successed")
 	ctb.next.ServeHTTP(rw, req)
 }
