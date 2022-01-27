@@ -46,11 +46,6 @@ func (ra *rbacAuth) GetTracingInformation() (string, ext.SpanKindEnum) {
 }
 
 func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	// TODO: check app exist
-	// TODO: check user exist
-	// TODO: check user login
-	// TODO: check user session
-	// TODO: check user permission
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ra.name, authTypeName))
 
 	userID := ""
@@ -112,7 +107,6 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			ok = false
 			goto lFail
 		}
-		// TODO: user authorize
 		_, err = resty.New().R().
 			SetBody(aReq).
 			SetResult(&aResp).
