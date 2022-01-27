@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/opentracing/opentracing-go/ext"
@@ -9,6 +10,8 @@ import (
 	"github.com/traefik/traefik/v2/pkg/log"
 	"github.com/traefik/traefik/v2/pkg/middlewares"
 	"github.com/traefik/traefik/v2/pkg/tracing"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const (
@@ -16,6 +19,7 @@ const (
 	authHeaderApp  = "X-App-ID"
 	authHeaderUser = "X-User-ID"
 	authHeaderRole = "X-App-Login-Token"
+	authHost       = "authing-gateway.kube-system.svc.cluster.local:50250"
 )
 
 type rbacAuth struct {
@@ -77,6 +81,28 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		ok = false
 	}
 
+	var err error
+
+	type authReq struct {
+		AppID    string
+		UserID   string
+		Token    string
+		Resource string
+		Method   string
+	}
+
+	type authResp struct {
+		Allowed bool
+	}
+	aReq := authReq{
+		AppID:    appID,
+		UserID:   userID,
+		Token:    userToken,
+		Resource: req.URL.String(),
+		Method:   req.Method,
+	}
+	aResp := authResp{}
+
 	if !ok {
 		goto lFail
 	}
@@ -87,8 +113,26 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			goto lFail
 		}
 		// TODO: user authorize
+		_, err = resty.New().R().
+			SetBody(aReq).
+			SetResult(&aResp).
+			Post(fmt.Sprintf("http://%v/v1/auth/by/app/role/user"))
 	} else {
-		// TODO: app authorize
+		_, err = resty.New().R().
+			SetBody(aReq).
+			SetResult(&aResp).
+			Post(fmt.Sprintf("http://%v/v1/auth/by/app"))
+	}
+
+	if err != nil {
+		logger.Errorf("fail auth by app: %v", err)
+		ok = false
+		goto lFail
+	}
+
+	if !aResp.Allowed {
+		logger.Warnf("forbidden access")
+		ok = false
 	}
 
 lFail:
