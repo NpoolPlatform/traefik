@@ -519,4 +519,5 @@ type HeadersToBody struct {
 
 // RBACAuth holds the RBACAuth configuration.
 type RBACAuth struct {
+	HeaderNames []string `json:"headerNames,omitempty" toml:"headerNames,omitempty" yaml:"headerNames,omitempty" export:"true"`
 }
