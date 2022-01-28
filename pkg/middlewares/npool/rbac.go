@@ -1,4 +1,4 @@
-package auth
+package npool
 
 import (
 	"context"
@@ -30,7 +30,7 @@ type rbacAuth struct {
 
 // NewRBAC creates a forward auth middleware.
 func NewRBAC(ctx context.Context, next http.Handler, config dynamic.RBACAuth, name string) (http.Handler, error) {
-	log.FromContext(middlewares.GetLoggerCtx(ctx, name, forwardedTypeName)).Debug("Creating middleware")
+	log.FromContext(middlewares.GetLoggerCtx(ctx, name, authTypeName)).Debug("Creating middleware")
 
 	ra := &rbacAuth{
 		name:        name,

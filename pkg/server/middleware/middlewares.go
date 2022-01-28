@@ -29,6 +29,8 @@ import (
 	"github.com/traefik/traefik/v2/pkg/middlewares/stripprefixregex"
 	"github.com/traefik/traefik/v2/pkg/middlewares/tracing"
 	"github.com/traefik/traefik/v2/pkg/server/provider"
+
+	"github.com/traefik/traefik/v2/pkg/middlewares/npool"
 )
 
 type middlewareStackType int
@@ -346,7 +348,7 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 		}
 
 		middleware = func(next http.Handler) (http.Handler, error) {
-			return headers.NewHeadersToBody(ctx, next, *config.HeadersToBody, middlewareName)
+			return npool.NewHeadersToBody(ctx, next, *config.HeadersToBody, middlewareName)
 		}
 	}
 
@@ -357,7 +359,7 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 		}
 
 		middleware = func(next http.Handler) (http.Handler, error) {
-			return auth.NewRBAC(ctx, next, *config.RBACAuth, middlewareName)
+			return npool.NewRBAC(ctx, next, *config.RBACAuth, middlewareName)
 		}
 	}
 
