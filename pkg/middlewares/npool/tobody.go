@@ -72,7 +72,22 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		bodyMap[name] = header
+		bodyName := ""
+		switch name {
+		case authHeaderApp:
+			bodyName = "AppID"
+		case authHeaderUser:
+			bodyName = "UserID"
+		case authHeaderRole:
+			bodyName = "Token"
+		}
+
+		if bodyName == "" {
+			logger.Warnf("unexpected header to body")
+			continue
+		}
+
+		bodyMap[bodyName] = header
 	}
 
 	if !ok {

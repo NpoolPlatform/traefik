@@ -15,11 +15,8 @@ import (
 )
 
 const (
-	authTypeName   = "RBACAuth"
-	authHeaderApp  = "X-App-ID"
-	authHeaderUser = "X-User-ID"
-	authHeaderRole = "X-App-Login-Token"
-	authHost       = "authing-gateway.kube-system.svc.cluster.local:50250"
+	authTypeName = "RBACAuth"
+	authHost     = "authing-gateway.kube-system.svc.cluster.local:50250"
 )
 
 type rbacAuth struct {
