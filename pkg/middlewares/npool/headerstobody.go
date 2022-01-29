@@ -63,12 +63,9 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	ok := true
 	for _, name := range ctb.headerNames {
 		header := req.Header.Get(name)
 		if header == "" {
-			logger.Warnf("fail get header %v", name)
-			ok = false
 			continue
 		}
 
@@ -88,13 +85,6 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		bodyMap[bodyName] = header
-	}
-
-	if !ok {
-		logger.Warnf("header parse failed")
-		tracing.SetErrorWithEvent(req, "header parse failed")
-		rw.WriteHeader(http.StatusForbidden)
-		return
 	}
 
 	myBody, err = json.Marshal(&bodyMap)
