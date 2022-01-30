@@ -107,12 +107,12 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		_, err = resty.New().R().
 			SetBody(aReq).
 			SetResult(&aResp).
-			Post(fmt.Sprintf("http://%v/v1/auth/by/app/role/user"))
+			Post(fmt.Sprintf("http://%v/v1/auth/by/app/role/user", authHost))
 	} else {
 		_, err = resty.New().R().
 			SetBody(aReq).
 			SetResult(&aResp).
-			Post(fmt.Sprintf("http://%v/v1/auth/by/app"))
+			Post(fmt.Sprintf("http://%v/v1/auth/by/app", authHost))
 	}
 
 	if err != nil {
