@@ -94,6 +94,7 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		Method:   req.Method,
 	}
 	var aResp *authResp
+	var resp *resty.Response
 
 	if !ok {
 		goto lFail
@@ -104,19 +105,15 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			ok = false
 			goto lFail
 		}
-		resp, _err := resty.New().R().
+		resp, err = resty.New().R().
 			SetBody(aReq).
 			SetResult(&authResp{}).
 			Post(fmt.Sprintf("http://%v/v1/auth/by/app/role/user", authHost))
-		aResp = resp.Result().(*authResp)
-		err = _err
 	} else {
-		resp, _err := resty.New().R().
+		resp, err = resty.New().R().
 			SetBody(aReq).
 			SetResult(&authResp{}).
 			Post(fmt.Sprintf("http://%v/v1/auth/by/app", authHost))
-		aResp = resp.Result().(*authResp)
-		err = _err
 	}
 
 	if err != nil {
@@ -125,8 +122,9 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		goto lFail
 	}
 
+	aResp = resp.Result().(*authResp)
 	if !aResp.Allowed {
-		logger.Warnf("forbidden access")
+		logger.Warnf("forbidden access: %v", resp)
 		ok = false
 	}
 
