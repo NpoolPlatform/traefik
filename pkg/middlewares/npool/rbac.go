@@ -93,7 +93,7 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		Resource: req.URL.String(),
 		Method:   req.Method,
 	}
-	aResp := authResp{}
+	var aResp *authResp
 
 	if !ok {
 		goto lFail
@@ -104,15 +104,19 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			ok = false
 			goto lFail
 		}
-		_, err = resty.New().R().
+		resp, _err := resty.New().R().
 			SetBody(aReq).
-			SetResult(&aResp).
+			SetResult(&authResp{}).
 			Post(fmt.Sprintf("http://%v/v1/auth/by/app/role/user", authHost))
+		aResp = resp.Result().(*authResp)
+		err = _err
 	} else {
-		_, err = resty.New().R().
+		resp, _err := resty.New().R().
 			SetBody(aReq).
-			SetResult(&aResp).
+			SetResult(&authResp{}).
 			Post(fmt.Sprintf("http://%v/v1/auth/by/app", authHost))
+		aResp = resp.Result().(*authResp)
+		err = _err
 	}
 
 	if err != nil {
