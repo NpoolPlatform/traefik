@@ -64,8 +64,10 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	var infoMap map[string]interface{}
-	if info, ok := bodyMap["Info"]; ok {
-		infoMap = info.(map[string]interface{})
+	infoExist := false
+
+	if info, ok := bodyMap["Info"]; ok && info != nil {
+		infoMap, infoExist = info.(map[string]interface{})
 	}
 
 	for _, name := range ctb.headerNames {
@@ -95,7 +97,7 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		case authHeaderApp:
 			fallthrough
 		case authHeaderUser:
-			if infoMap != nil {
+			if infoMap != nil && infoExist {
 				infoMap[bodyName] = header
 			}
 		}
