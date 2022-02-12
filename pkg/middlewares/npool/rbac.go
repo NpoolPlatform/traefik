@@ -116,8 +116,6 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			Post(fmt.Sprintf("http://%v/v1/auth/by/app", authHost))
 	}
 
-	logger.Infof("authorize %v for %v / %v: %v [%v]", aReq.Resource, aReq.AppID, aReq.UserID, aReq.Resource, err)
-
 	if err != nil {
 		logger.Errorf("fail auth by app: %v", err)
 		ok = false
@@ -132,8 +130,8 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 lFail:
 	if !ok {
-		logger.Warnf("header parse failed")
-		tracing.SetErrorWithEvent(req, "header parse failed")
+		logger.Warnf("authorize failed")
+		tracing.SetErrorWithEvent(req, "authorize failed")
 		rw.WriteHeader(http.StatusForbidden)
 		return
 	}
