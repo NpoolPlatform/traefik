@@ -82,6 +82,8 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			bodyName = "AppID"
 		case authHeaderUser:
 			bodyName = "UserID"
+		case authHeaderLang:
+			bodyName = "LangID"
 		case authHeaderRole:
 			bodyName = "Token"
 		}
@@ -97,6 +99,8 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		case authHeaderApp:
 			fallthrough
 		case authHeaderUser:
+			fallthrough
+		case authHeaderLang:
 			if infoMap != nil && infoExist {
 				infoMap[bodyName] = header
 			}
