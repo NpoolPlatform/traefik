@@ -111,3 +111,4 @@ replace (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.27.1
+replace github.com/tencentcloud/tencentcloud-sdk-go v3.0.82+incompatible => github.com/tencentcloud/tencentcloud-sdk-go v1.0.191
