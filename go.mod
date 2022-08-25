@@ -72,6 +72,7 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.7.0
 	github.com/stvp/go-udp-testing v0.0.0-20191102171040-06b61409b154
+	github.com/tencentcloud/tencentcloud-sdk-go v3.0.233+incompatible // indirect
 	github.com/tinylib/msgp v1.0.2 // indirect
 	github.com/traefik/paerser v0.1.4
 	github.com/traefik/yaegi v0.10.0
