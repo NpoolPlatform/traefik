@@ -10,7 +10,7 @@ USER root
 
 ARG ALL_PROXY
 ENV all_proxy=$ALL_PROXY
-ENV GOPROXY=https://goproxy.cn,direct
+ENV GOPROXY=https://proxy.golang.com.cn,direct
 
 ARG KUBE_VERSION
 
