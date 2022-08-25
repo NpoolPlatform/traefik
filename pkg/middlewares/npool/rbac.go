@@ -16,7 +16,7 @@ import (
 
 const (
 	authTypeName = "RBACAuth"
-	authHost     = "appuser-gateway.kube-system.svc.cluster.local:50330"
+	authHost     = "appuser-gateway.kube-system.svc.cluster.local:50500"
 )
 
 type rbacAuth struct {
