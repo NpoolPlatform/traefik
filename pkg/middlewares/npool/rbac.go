@@ -91,7 +91,7 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	type authResp struct {
-		Allowed bool
+		Info bool // Here info is allowed
 	}
 	aReq := authReq{
 		AppID:    appID,
@@ -120,7 +120,7 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	aResp = resp.Result().(*authResp)
-	if !aResp.Allowed {
+	if !aResp.Info {
 		logger.Warnf("forbidden access: %v", resp)
 		ok = false
 	}
