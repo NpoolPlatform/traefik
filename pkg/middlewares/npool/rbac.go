@@ -12,6 +12,8 @@ import (
 	"github.com/traefik/traefik/v2/pkg/tracing"
 
 	"github.com/go-resty/resty/v2"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -64,7 +66,9 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			appID = req.Header.Get(authHeaderApp)
 		case authHeaderUser:
 			_userID := req.Header.Get(authHeaderUser)
-			userID = &_userID
+			if _, err := uuid.Parse(_userID); err == nil {
+				userID = &_userID
+			}
 		case authHeaderRole:
 			_userToken := req.Header.Get(authHeaderRole)
 			userToken = &_userToken
