@@ -12,6 +12,8 @@ import (
 	"github.com/traefik/traefik/v2/pkg/log"
 	"github.com/traefik/traefik/v2/pkg/middlewares"
 	"github.com/traefik/traefik/v2/pkg/tracing"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -76,9 +78,25 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
+		switch name {
+		case authHeaderApp:
+			fallthrough //nolint
+		case authHeaderUser:
+			fallthrough //nolint
+		case authHeaderLang:
+			if _, err := uuid.Parse(header); err != nil {
+				logger.Warnf("invalid header value")
+				continue
+			}
+		}
+
 		bodyName := ""
 		switch name {
 		case authHeaderApp:
+			if _, err := uuid.Parse(header); err != nil {
+				logger.Warnf("invalid header value")
+				continue
+			}
 			bodyName = "AppID"
 		case authHeaderUser:
 			bodyName = "UserID"

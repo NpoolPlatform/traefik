@@ -36,6 +36,7 @@ require (
 	github.com/go-resty/resty/v2 v2.1.1-0.20191201195748-d7b97669fe48
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-github/v28 v28.1.1
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/consul v1.10.0
@@ -72,6 +73,7 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.7.0
 	github.com/stvp/go-udp-testing v0.0.0-20191102171040-06b61409b154
+	github.com/tencentcloud/tencentcloud-sdk-go v3.0.233+incompatible // indirect
 	github.com/tinylib/msgp v1.0.2 // indirect
 	github.com/traefik/paerser v0.1.4
 	github.com/traefik/yaegi v0.10.0
@@ -111,3 +113,5 @@ replace (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.27.1
+
+replace github.com/tencentcloud/tencentcloud-sdk-go v3.0.83+incompatible => github.com/tencentcloud/tencentcloud-sdk-go v3.0.233+incompatible

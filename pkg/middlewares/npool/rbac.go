@@ -12,11 +12,13 @@ import (
 	"github.com/traefik/traefik/v2/pkg/tracing"
 
 	"github.com/go-resty/resty/v2"
+
+	"github.com/google/uuid"
 )
 
 const (
 	authTypeName = "RBACAuth"
-	authHost     = "authing-gateway.kube-system.svc.cluster.local:50250"
+	authHost     = "appuser-gateway.kube-system.svc.cluster.local:50500"
 )
 
 type rbacAuth struct {
@@ -45,11 +47,12 @@ func (ra *rbacAuth) GetTracingInformation() (string, ext.SpanKindEnum) {
 func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ra.name, authTypeName))
 
-	userID := ""
-	appID := ""
-	userToken := ""
+	var userID *string
+	var appID string
+	var userToken *string
 
 	ok := true
+
 	for _, name := range ra.headerNames {
 		header := req.Header.Get(name)
 		if header == "" {
@@ -62,9 +65,13 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		case authHeaderApp:
 			appID = req.Header.Get(authHeaderApp)
 		case authHeaderUser:
-			userID = req.Header.Get(authHeaderUser)
+			_userID := req.Header.Get(authHeaderUser)
+			if _, err := uuid.Parse(_userID); err == nil {
+				userID = &_userID
+			}
 		case authHeaderRole:
-			userToken = req.Header.Get(authHeaderRole)
+			_userToken := req.Header.Get(authHeaderRole)
+			userToken = &_userToken
 		}
 	}
 
@@ -72,19 +79,23 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		logger.Warnf("invalid app id")
 		ok = false
 	}
+	if userID != nil && userToken == nil {
+		logger.Warnf("invalid userid & usertoken")
+		ok = false
+	}
 
 	var err error
 
 	type authReq struct {
 		AppID    string
-		UserID   string
-		Token    string
+		UserID   *string
+		Token    *string
 		Resource string
 		Method   string
 	}
 
 	type authResp struct {
-		Allowed bool
+		Info bool // Here info is allowed
 	}
 	aReq := authReq{
 		AppID:    appID,
@@ -100,30 +111,20 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		goto lFail
 	}
 
-	if userID != "" {
-		if userToken == "" {
-			ok = false
-			goto lFail
-		}
-		resp, err = resty.New().R().
-			SetBody(aReq).
-			SetResult(&authResp{}).
-			Post(fmt.Sprintf("http://%v/v1/auth/by/app/role/user", authHost))
-	} else {
-		resp, err = resty.New().R().
-			SetBody(aReq).
-			SetResult(&authResp{}).
-			Post(fmt.Sprintf("http://%v/v1/auth/by/app", authHost))
-	}
-
+	resp, err = resty.
+		New().
+		R().
+		SetBody(aReq).
+		SetResult(&authResp{}).
+		Post(fmt.Sprintf("http://%v/v1/authenticate", authHost))
 	if err != nil {
-		logger.Errorf("fail auth by app: %v", err)
+		logger.Errorf("fail auth: %v", err)
 		ok = false
 		goto lFail
 	}
 
 	aResp = resp.Result().(*authResp)
-	if !aResp.Allowed {
+	if !aResp.Info {
 		logger.Warnf("forbidden access: %v", resp)
 		ok = false
 	}
