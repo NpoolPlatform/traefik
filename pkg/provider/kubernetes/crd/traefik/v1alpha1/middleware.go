@@ -49,6 +49,8 @@ type MiddlewareSpec struct {
 	Retry             *Retry                     `json:"retry,omitempty"`
 	ContentType       *dynamic.ContentType       `json:"contentType,omitempty"`
 	GrpcWeb           *dynamic.GrpcWeb           `json:"grpcWeb,omitempty"`
+	HeadersToBody     *dynamic.HeadersToBody         `json:"headersToBody,omitempty"`
+	RBACAuth          *dynamic.RBACAuth              `json:"rbacAuth,omitempty"`
 	// Plugin defines the middleware plugin configuration.
 	// More info: https://doc.traefik.io/traefik/plugins/
 	Plugin map[string]apiextensionv1.JSON `json:"plugin,omitempty"`

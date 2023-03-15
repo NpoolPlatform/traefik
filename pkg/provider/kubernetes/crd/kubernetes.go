@@ -282,6 +282,8 @@ func (p *Provider) loadConfigurationFromCRD(ctx context.Context, client Client) 
 			Retry:             retry,
 			ContentType:       middleware.Spec.ContentType,
 			GrpcWeb:           middleware.Spec.GrpcWeb,
+			HeadersToBody:     middleware.Spec.HeadersToBody,
+			RBACAuth:          middleware.Spec.RBACAuth,
 			Plugin:            plugin,
 		}
 	}

@@ -4,7 +4,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016-2020 Containous SAS; 2020-2022 Traefik Labs
+Copyright (c) 2016-2020 Containous SAS; 2020-2023 Traefik Labs
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -772,6 +772,16 @@ func (in *MiddlewareSpec) DeepCopyInto(out *MiddlewareSpec) {
 	if in.GrpcWeb != nil {
 		in, out := &in.GrpcWeb, &out.GrpcWeb
 		*out = new(dynamic.GrpcWeb)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.HeadersToBody != nil {
+		in, out := &in.HeadersToBody, &out.HeadersToBody
+		*out = new(dynamic.HeadersToBody)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.RBACAuth != nil {
+		in, out := &in.RBACAuth, &out.RBACAuth
+		*out = new(dynamic.RBACAuth)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Plugin != nil {

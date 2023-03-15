@@ -13,6 +13,7 @@ TRAEFIK_IMAGE := $(if $(REPONAME),$(REPONAME),"traefik/traefik")
 
 INTEGRATION_OPTS := $(if $(MAKE_DOCKER_HOST),-e "DOCKER_HOST=$(MAKE_DOCKER_HOST)",-v "/var/run/docker.sock:/var/run/docker.sock")
 DOCKER_BUILD_ARGS := $(if $(DOCKER_VERSION), "--build-arg=DOCKER_VERSION=$(DOCKER_VERSION)",)
+DOCKER_BUILD_ARGS += "--build-arg=ALL_PROXY=${all_proxy}"
 
 # only used when running in docker
 TRAEFIK_ENVS := \
@@ -31,6 +32,7 @@ DOCKER_RUN_OPTS := $(TRAEFIK_ENVS) $(TRAEFIK_MOUNT) "$(TRAEFIK_DEV_IMAGE)"
 DOCKER_NON_INTERACTIVE ?= false
 DOCKER_RUN_TRAEFIK := docker run $(INTEGRATION_OPTS) $(if $(DOCKER_NON_INTERACTIVE), , -it) $(DOCKER_RUN_OPTS)
 DOCKER_RUN_TRAEFIK_TEST := docker run --add-host=host.docker.internal:127.0.0.1 --rm --name=traefik --network traefik-test-network -v $(PWD):$(PWD) -w $(PWD) $(INTEGRATION_OPTS) $(if $(DOCKER_NON_INTERACTIVE), , -it) $(DOCKER_RUN_OPTS)
+DOCKER_BUILD_RUN_TRAEFIK := docker run --add-host=host.docker.internal:127.0.0.1 $(INTEGRATION_OPTS) $(if $(DOCKER_NON_INTERACTIVE), , -it) -e GO111MODULE=on -e GOPROXY=https://goproxy.cn,direct --name traefik-build-dev $(DOCKER_RUN_OPTS)
 DOCKER_RUN_TRAEFIK_NOTTY := docker run $(INTEGRATION_OPTS) $(if $(DOCKER_NON_INTERACTIVE), , -i) $(DOCKER_RUN_OPTS)
 
 IN_DOCKER ?= true
@@ -86,6 +88,12 @@ binary: generate-webui build-dev-image
 .PHONY: binary-debug
 binary-debug: generate-webui
 	GOOS=linux ./script/make.sh binary
+
+traefik-binary: $(PRE_TARGET)
+	$(if $(PRE_TARGET),$(DOCKER_BUILD_RUN_TRAEFIK)) go build -o /go/src/github.com/traefik/traefik/$(BIND_DIR)/traefik /go/src/github.com/traefik/traefik/cmd/traefik
+	docker cp traefik-build-dev:/go/src/github.com/traefik/traefik/$(BIND_DIR)/traefik ./dist/traefik
+	docker rm traefik-build-dev
+	docker rmi ${TRAEFIK_DEV_IMAGE}
 
 ## Build the binary for the standard platforms (linux, darwin, windows)
 .PHONY: crossbinary-default
@@ -206,6 +214,7 @@ fmt:
 
 .PHONY: run-dev
 run-dev:
+	GO111MODULE=off go get -u github.com/containous/go-bindata/...
 	go generate
 	GO111MODULE=on go build ./cmd/traefik
 	./traefik

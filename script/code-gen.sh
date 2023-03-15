@@ -8,11 +8,16 @@ MODULE_VERSION="v2"
 IMAGE_NAME="kubernetes-codegen:latest"
 CURRENT_DIR="$(pwd)"
 
+USER="test"
+export MUID=1000
+export MGID=1000
+
 echo "Building codegen Docker image..."
 docker build --build-arg KUBE_VERSION=v0.20.2 \
              --build-arg USER="${USER}" \
              --build-arg UID="$(id -u)" \
              --build-arg GID="$(id -g)" \
+             --build-arg ALL_PROXY=$all_proxy \
              -f "./script/codegen.Dockerfile" \
              -t "${IMAGE_NAME}" \
              "."

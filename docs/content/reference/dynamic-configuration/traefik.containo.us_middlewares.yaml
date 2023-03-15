@@ -534,6 +534,14 @@ spec:
                     format: int64
                     type: integer
                 type: object
+              headersToBody:
+                description: HeadersToBody holds the HeadersToBody configuration.
+                properties:
+                  headerNames:
+                    items:
+                      type: string
+                    type: array
+                type: object
               inFlightReq:
                 description: 'InFlightReq holds the in-flight request middleware configuration.
                   This middleware limits the number of requests being processed and
@@ -775,6 +783,14 @@ spec:
                           Host as the source.
                         type: boolean
                     type: object
+                type: object
+              rbacAuth:
+                description: RBACAuth holds the RBACAuth configuration.
+                properties:
+                  headerNames:
+                    items:
+                      type: string
+                    type: array
                 type: object
               redirectRegex:
                 description: 'RedirectRegex holds the redirect regex middleware configuration.
