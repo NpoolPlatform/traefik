@@ -7,7 +7,6 @@ import (
 
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/traefik/traefik/v2/pkg/config/dynamic"
-	"github.com/traefik/traefik/v2/pkg/log"
 	"github.com/traefik/traefik/v2/pkg/middlewares"
 	"github.com/traefik/traefik/v2/pkg/tracing"
 
@@ -27,7 +26,7 @@ type rbacAuth struct {
 
 // NewRBAC creates a forward auth middleware.
 func NewRBAC(ctx context.Context, next http.Handler, config dynamic.RBACAuth, name string) (http.Handler, error) {
-	log.FromContext(middlewares.GetLoggerCtx(ctx, name, authTypeName)).Debug("Creating middleware")
+	middlewares.GetLogger(ctx, name, authTypeName).Debug().Msg("Creating middleware")
 
 	ra := &rbacAuth{
 		name:        name,
@@ -43,7 +42,7 @@ func (ra *rbacAuth) GetTracingInformation() (string, ext.SpanKindEnum) {
 }
 
 func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ra.name, authTypeName))
+	logger := middlewares.GetLogger(req.Context(), ra.name, authTypeName)
 
 	userID := ""
 	appID := ""
@@ -53,7 +52,7 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	for _, name := range ra.headerNames {
 		header := req.Header.Get(name)
 		if header == "" {
-			logger.Warnf("fail get header %v", name)
+			logger.Warn().Msgf("fail get header %v", name)
 			ok = false
 			continue
 		}
@@ -69,7 +68,7 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if appID == "" {
-		logger.Warnf("invalid app id")
+		logger.Warn().Msgf("invalid app id")
 		ok = false
 	}
 
@@ -116,19 +115,19 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		logger.Errorf("fail auth by app: %v", err)
+		logger.Error().Msgf("fail auth by app: %v", err)
 		ok = false
 		goto lFail
 	}
 
 	if !aResp.Allowed {
-		logger.Warnf("forbidden access")
+		logger.Warn().Msgf("forbidden access")
 		ok = false
 	}
 
 lFail:
 	if !ok {
-		logger.Warnf("header parse failed")
+		logger.Warn().Msgf("header parse failed")
 		tracing.SetErrorWithEvent(req, "header parse failed")
 		rw.WriteHeader(http.StatusForbidden)
 		return

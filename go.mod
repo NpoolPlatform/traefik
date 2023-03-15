@@ -400,4 +400,5 @@ replace github.com/jaguilar/vt100 => github.com/tonistiigi/vt100 v0.0.0-20190402
 exclude github.com/tencentcloud/tencentcloud-sdk-go v3.0.83+incompatible
 
 // replace github.com/go-logr/logr => github.com/go-logr/logr v0.4.0
-replace google.golang.org/grpc => google.golang.org/grpc v1.27.1
+
+replace golang.org/x/sys@v0.0.0-20180830151530-49385e6e1522 => golang.org/x/sys v0.3.0

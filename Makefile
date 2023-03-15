@@ -89,8 +89,9 @@ binary: generate-webui build-dev-image
 binary-debug: generate-webui
 	GOOS=linux ./script/make.sh binary
 
-traefik-binary: $(PRE_TARGET)
-	$(if $(PRE_TARGET),$(DOCKER_BUILD_RUN_TRAEFIK)) go build -o /go/src/github.com/traefik/traefik/$(BIND_DIR)/traefik /go/src/github.com/traefik/traefik/cmd/traefik
+traefik-binary: build-dev-image
+	docker rm traefik-build-dev || true
+	$(if $(IN_DOCKER),$(DOCKER_BUILD_RUN_TRAEFIK)) go build -o /go/src/github.com/traefik/traefik/$(BIND_DIR)/traefik /go/src/github.com/traefik/traefik/cmd/traefik
 	docker cp traefik-build-dev:/go/src/github.com/traefik/traefik/$(BIND_DIR)/traefik ./dist/traefik
 	docker rm traefik-build-dev
 	docker rmi ${TRAEFIK_DEV_IMAGE}
