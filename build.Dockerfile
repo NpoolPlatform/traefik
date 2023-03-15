@@ -38,7 +38,7 @@ RUN git config --global --add safe.directory "${HOST_PWD}"
 # Download go modules
 COPY go.mod .
 COPY go.sum .
-# COPY . /go/src/github.com/traefik/traefik
+COPY . /go/src/github.com/traefik/traefik
 # COPY . /go/src/github.com/traefik/traefik/v2
 RUN GO111MODULE=on GOPROXY=https://goproxy.cn,direct all_proxy=$ALL_PROXY go mod download
 

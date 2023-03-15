@@ -22,7 +22,7 @@ RUN all_proxy=$ALL_PROXY go install k8s.io/code-generator/cmd/informer-gen@$KUBE
 RUN all_proxy=$ALL_PROXY go install k8s.io/code-generator/cmd/deepcopy-gen@$KUBE_VERSION
 RUN all_proxy=$ALL_PROXY go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.6.2
 
-# COPY . /go/src/github.com/traefik/traefik
+COPY . /go/src/github.com/traefik/traefik
 # COPY . /go/src/github.com/traefik/traefik/v2
 
 RUN mkdir -p $GOPATH/src/k8s.io/code-generator
