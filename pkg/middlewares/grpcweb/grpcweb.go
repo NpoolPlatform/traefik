@@ -16,6 +16,7 @@ func New(ctx context.Context, next http.Handler, config dynamic.GrpcWeb, name st
 	middlewares.GetLogger(ctx, name, typeName).Debug().Msg("Creating middleware")
 
 	return grpcweb.WrapHandler(next, grpcweb.WithCorsForRegisteredEndpointsOnly(false), grpcweb.WithOriginFunc(func(origin string) bool {
+		middlewares.GetLogger(ctx, name, typeName).Debug().Msgf("GrpcWeb allowOrigins %v, origin %v", config.AllowOrigins, origin)
 		for _, originCfg := range config.AllowOrigins {
 			if originCfg == "*" || originCfg == origin {
 				return true

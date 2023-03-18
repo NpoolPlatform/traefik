@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/traefik/traefik/v2/pkg/config/dynamic"
+	"github.com/traefik/traefik/v2/pkg/middlewares"
 )
 
 // Header is a middleware that helps setup a few basic security features.
@@ -130,12 +131,17 @@ func (s *Header) PostRequestModifyResponseHeaders(res *http.Response) error {
 // and returns if it is a preflight request.
 // If not a preflight, it handles the preRequestModifyCorsResponseHeaders.
 func (s *Header) processCorsHeaders(rw http.ResponseWriter, req *http.Request) bool {
+	logger := middlewares.GetLogger(req.Context(), "Cors", "Headers")
+	logger.Debug().Msgf("HasCorsHeaders %v", s.hasCorsHeaders)
+
 	if !s.hasCorsHeaders {
 		return false
 	}
 
 	reqAcMethod := req.Header.Get("Access-Control-Request-Method")
 	originHeader := req.Header.Get("Origin")
+
+	logger.Debug().Msgf("reqAcMethod %v, originHeader %v, method %v", reqAcMethod, originHeader, req.Method)
 
 	if reqAcMethod != "" && originHeader != "" && req.Method == http.MethodOptions {
 		// If the request is an OPTIONS request with an Access-Control-Request-Method header,
