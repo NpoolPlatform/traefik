@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -171,8 +170,6 @@ func GetLogData(req *http.Request) *LogData {
 }
 
 func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request, next http.Handler) {
-	debug.PrintStack()
-
 	now := time.Now().UTC()
 
 	core := CoreLogData{
