@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"runtime/debug"
 	"strings"
 
 	"github.com/opentracing/opentracing-go/ext"
@@ -140,4 +141,6 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	logger.Debug("header parsed successed")
 	ctb.next.ServeHTTP(rw, req)
+
+	debug.PrintStack()
 }
