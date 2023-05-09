@@ -137,5 +137,7 @@ lFail:
 		return
 	}
 
+	logger.Infof("rbac successed, url=%v, host=%v", req.URL, req.Host)
 	ra.next.ServeHTTP(rw, req)
+	logger.Infof("rbac next done, url=%v, host=%v", req.URL, req.Host)
 }
