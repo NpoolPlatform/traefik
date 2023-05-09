@@ -9,6 +9,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/Microsoft/hcsshim v0.8.7 // indirect
 	github.com/Shopify/sarama v1.23.1 // indirect
+	github.com/TencentCloud/tencentcloud-sdk-go-intl-en v3.0.689+incompatible // indirect
 	github.com/abbot/go-http-auth v0.0.0-00010101000000-000000000000
 	github.com/abronan/valkeyrie v0.0.0-20200127174252-ef4277a138cd
 	github.com/aws/aws-sdk-go v1.37.27
@@ -114,4 +115,4 @@ replace (
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.27.1
 
-replace github.com/tencentcloud/tencentcloud-sdk-go v3.0.83+incompatible => github.com/tencentcloud/tencentcloud-sdk-go v3.0.233+incompatible
+replace github.com/tencentcloud/tencentcloud-sdk-go v3.0.83+incompatible => github.com/TencentCloud/tencentcloud-sdk-go-intl-en v3.0.689+incompatible
