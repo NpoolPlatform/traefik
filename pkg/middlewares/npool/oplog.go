@@ -48,7 +48,7 @@ func (ol *opLog) GetTracingInformation() (string, ext.SpanKindEnum) {
 }
 
 func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" || req.Method != "GET" {
+	if req.Method != "POST" && req.Method != "GET" {
 		ol.next.ServeHTTP(rw, req)
 		return
 	}
