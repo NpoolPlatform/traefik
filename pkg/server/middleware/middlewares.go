@@ -352,6 +352,17 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 		}
 	}
 
+	// OpLog
+	if config.OpLog != nil {
+		if middleware != nil {
+			return nil, badConf
+		}
+
+		middleware = func(next http.Handler) (http.Handler, error) {
+			return npool.NewOpLog(ctx, next, *config.OpLog, middlewareName)
+		}
+	}
+
 	// RBACAuth
 	if config.RBACAuth != nil {
 		if middleware != nil {
