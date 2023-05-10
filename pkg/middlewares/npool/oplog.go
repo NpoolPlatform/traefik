@@ -56,11 +56,18 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ol.name, opLogTypeName))
 
 	type opLogReq struct {
-		AppID     string
-		UserID    *string
-		Path      string
-		Method    string
-		Arguments string
+		EntID       *string
+		AppID       string
+		UserID      *string
+		Path        string
+		Method      string
+		Arguments   string
+		StatusCode  int
+		ReqHeaders  string
+		RespHeaders string
+		NewValue    string
+		Result      *string
+		FailReason  string
 	}
 
 	olq := &opLogReq{
@@ -92,8 +99,11 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 	olq.Arguments = string(_body)
 
+	type opLogInfo struct {
+		EntID string
+	}
 	type opLogResp struct {
-		Info map[string]map[string]string
+		Info opLogInfo
 	}
 	var resp *resty.Response
 
@@ -115,28 +125,45 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	ol.next.ServeHTTP(_rw, req)
 	logger.Infof("oplog next done, url=%v, host=%v", req.URL, req.Host)
 
-	olr := resp.Result().(*opLogResp)
+	if resp == nil {
+		return
+	}
 
-	_olq, _ := json.Marshal(olq)
-	_olr, _ := json.Marshal(olr)
-	headers, _ := json.Marshal(_rw.Header())
+	olr := resp.Result().(*opLogResp)
+	if _, err := uuid.Parse(olr.Info.EntID); err != nil {
+		logger.Warnf("invalid oplog ent_id %v: %v", olr.Info.EntID, err)
+		return
+	}
+
+	respHeaders, _ := json.Marshal(_rw.Header())
+	reqHeaders, _ := json.Marshal(req.Header)
 	statusCode := http.StatusOK
+	result := "Pass"
 	if req.Response != nil {
 		statusCode = req.Response.StatusCode
 	}
+	if statusCode != http.StatusOK {
+		result = "Fail"
+	}
 
-	logger.Infof(
-		"oplog serve done, url=%v, host=%v, req=%v, resp=%v, resp_len=%v, olq=%v, olr=%v, headers=%v, status_code=%v",
-		req.URL,
-		req.Host,
-		string(_body),
-		buffer.String(),
-		buffer.Len(),
-		string(_olq),
-		string(_olr),
-		string(headers),
-		statusCode,
-	)
+	olq = &opLogReq{
+		EntID:       &olr.Info.EntID,
+		NewValue:    buffer.String(),
+		StatusCode:  statusCode,
+		ReqHeaders:  string(reqHeaders),
+		RespHeaders: string(respHeaders),
+		Result:      &result,
+		FailReason:  buffer.String(),
+	}
+	_, _ = resty.
+		New().
+		R().
+		SetBody(olq).
+		SetResult(&opLogResp{}).
+		Post(fmt.Sprintf("http://%v/v1/update/oplog", opLogHost))
+	if err != nil {
+		logger.Warnf("fail update oplog: %v", err)
+	}
 }
 
 type multiWriter struct {
