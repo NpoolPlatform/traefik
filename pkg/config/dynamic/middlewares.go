@@ -520,6 +520,7 @@ type HeadersToBody struct {
 
 // OpLog holds the OpLog configuration.
 type OpLog struct {
+	Empty []string `json:"empty,omitempty" toml:"empty,omitempty" yaml:"empty,omitempty" export:"true"`
 }
 
 // +k8s:deepcopy-gen=true
