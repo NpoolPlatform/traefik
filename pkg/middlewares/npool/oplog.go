@@ -1,7 +1,6 @@
 package npool
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -105,7 +104,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		SetBody(olq).
 		SetResult(&opLogResp{}).
 		Post(fmt.Sprintf("http://%v/v1/create/oplog", opLogHost))
-	if err == nil {
+	if err != nil {
 		logger.Warnf("fail create oplog: %v", err)
 	}
 
@@ -137,18 +136,15 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 type multiWriter struct {
-	bufWriter *bufio.Writer
-	rw        http.ResponseWriter
-	multi     io.Writer
+	rw    http.ResponseWriter
+	multi io.Writer
 }
 
 func newMultiWriter(buffer *bytes.Buffer, rw http.ResponseWriter) http.ResponseWriter {
-	bufWriter := bufio.NewWriter(buffer)
-	multi := io.MultiWriter(bufWriter, rw)
+	multi := io.MultiWriter(buffer, rw)
 	return &multiWriter{
-		bufWriter: bufWriter,
-		rw:        rw,
-		multi:     multi,
+		rw:    rw,
+		multi: multi,
 	}
 }
 
