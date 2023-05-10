@@ -127,6 +127,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	ol.next.ServeHTTP(_rw, req)
 
 	if resp == nil {
+		logger.Warnf("fail create oplog: nil resp")
 		return
 	}
 
@@ -156,15 +157,13 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		Result:      &result,
 		FailReason:  buffer.String(),
 	}
-	_, err = resty.
+	resp, _ = resty.
 		New().
 		R().
 		SetBody(olq).
 		SetResult(&opLogResp{}).
 		Post(fmt.Sprintf("http://%v/v1/update/oplog", opLogHost))
-	if err != nil {
-		logger.Warnf("fail update oplog: %v", err)
-	}
+	logger.Warnf("fail update oplog: %v", resp)
 }
 
 type multiWriter struct {
