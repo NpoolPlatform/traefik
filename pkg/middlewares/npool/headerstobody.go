@@ -138,7 +138,5 @@ func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	req.Body = ioutil.NopCloser(strings.NewReader(string(myBody)))
 	req.ContentLength = int64(len(myBody))
 
-	logger.Infof("header parsed successed, url=%v, host=%v", req.URL, req.Host)
 	ctb.next.ServeHTTP(rw, req)
-	logger.Infof("header next done, url=%v, host=%v", req.URL, req.Host)
 }

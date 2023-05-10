@@ -124,9 +124,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	buffer := bytes.NewBuffer(nil)
 	_rw := newMultiWriter(buffer, rw)
 
-	logger.Infof("oplog successed, url=%v, host=%v", req.URL, req.Host)
 	ol.next.ServeHTTP(_rw, req)
-	logger.Infof("oplog next done, url=%v, host=%v", req.URL, req.Host)
 
 	if resp == nil {
 		return
