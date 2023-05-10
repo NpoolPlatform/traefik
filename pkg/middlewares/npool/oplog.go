@@ -157,13 +157,13 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		Result:      &result,
 		FailReason:  buffer.String(),
 	}
-	resp, _ = resty.
+	resp, err = resty.
 		New().
 		R().
 		SetBody(olq).
 		SetResult(&opLogResp{}).
 		Post(fmt.Sprintf("http://%v/v1/update/oplog", opLogHost))
-	logger.Warnf("fail update oplog: %v", resp)
+	logger.Warnf("fail update oplog: %v (%v)", resp, err)
 }
 
 type multiWriter struct {
