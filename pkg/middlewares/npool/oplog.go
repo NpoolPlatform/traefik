@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -116,7 +117,20 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger.Infof("oplog next done, url=%v, host=%v", req.URL, req.Host)
 
 	olr := resp.Result().(*opLogResp)
-	logger.Infof("oplog serve done, url=%v, host=%v, req=%v, resp=%v, olq=%v, olr=%v", req.URL, req.Host, _body, buffer.String(), olq, olr)
+
+	_olq, _ := json.Marshal(olq)
+	_olr, _ := json.Marshal(olr)
+
+	logger.Infof(
+		"oplog serve done, url=%v, host=%v, req=%v, resp=%v, resp_len=%v, olq=%v, olr=%v",
+		req.URL,
+		req.Host,
+		string(_body),
+		buffer.String(),
+		buffer.Len(),
+		_olq,
+		_olr,
+	)
 }
 
 type multiWriter struct {
