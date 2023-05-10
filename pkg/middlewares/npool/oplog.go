@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"runtime/debug"
 	"strings"
 
 	"github.com/opentracing/opentracing-go/ext"
@@ -131,8 +130,6 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		string(_olq),
 		string(_olr),
 	)
-
-	debug.PrintStack()
 }
 
 type multiWriter struct {
