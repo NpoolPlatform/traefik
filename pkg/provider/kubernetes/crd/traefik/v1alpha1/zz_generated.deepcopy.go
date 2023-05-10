@@ -732,6 +732,11 @@ func (in *MiddlewareSpec) DeepCopyInto(out *MiddlewareSpec) {
 		*out = new(dynamic.HeadersToBody)
 		**out = **in
 	}
+	if in.OpLog != nil {
+		in, out := &in.OpLog, &out.OpLog
+		*out = new(dynamic.OpLog)
+		**out = **in
+	}
 	if in.RBACAuth != nil {
 		in, out := &in.RBACAuth, &out.RBACAuth
 		*out = new(dynamic.RBACAuth)
