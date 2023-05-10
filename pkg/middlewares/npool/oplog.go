@@ -99,6 +99,9 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 	olq.Arguments = string(_body)
 
+	reqHeaders, _ := json.Marshal(req.Header)
+	olq.ReqHeaders = string(reqHeaders)
+
 	type opLogInfo struct {
 		EntID string
 	}
@@ -136,7 +139,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	respHeaders, _ := json.Marshal(_rw.Header())
-	reqHeaders, _ := json.Marshal(req.Header)
+	reqHeaders, _ = json.Marshal(req.Header)
 	statusCode := http.StatusOK
 	result := "Pass"
 	if req.Response != nil {
