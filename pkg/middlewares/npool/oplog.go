@@ -155,8 +155,12 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		ReqHeaders:  string(reqHeaders),
 		RespHeaders: string(respHeaders),
 		Result:      &result,
-		FailReason:  buffer.String(),
 	}
+
+	if statusCode != http.StatusOK {
+		olq.FailReason = buffer.String()
+	}
+
 	resp, err = resty.
 		New().
 		R().
