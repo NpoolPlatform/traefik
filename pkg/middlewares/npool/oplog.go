@@ -48,6 +48,11 @@ func (ol *opLog) GetTracingInformation() (string, ext.SpanKindEnum) {
 }
 
 func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" || req.Method != "GET" {
+		ol.next.ServeHTTP(rw, req)
+		return
+	}
+
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ol.name, opLogTypeName))
 
 	type opLogReq struct {
@@ -66,7 +71,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	header := req.Header.Get("X-App-ID")
 	if _, err := uuid.Parse(header); err != nil {
-		logger.Warnf("Parse X-App-ID failed")
+		logger.Warnf("Parse X-App-ID %v failed: %v", header, err)
 		tracing.SetErrorWithEvent(req, "Parse X-App-ID failed")
 		rw.WriteHeader(http.StatusForbidden)
 		return
