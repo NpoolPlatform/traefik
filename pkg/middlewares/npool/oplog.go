@@ -120,9 +120,13 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	_olq, _ := json.Marshal(olq)
 	_olr, _ := json.Marshal(olr)
 	headers, _ := json.Marshal(_rw.Header())
+	statusCode := http.StatusOK
+	if req.Response != nil {
+		statusCode = req.Response.StatusCode
+	}
 
 	logger.Infof(
-		"oplog serve done, url=%v, host=%v, req=%v, resp=%v, resp_len=%v, olq=%v, olr=%v, headers=%v",
+		"oplog serve done, url=%v, host=%v, req=%v, resp=%v, resp_len=%v, olq=%v, olr=%v, headers=%v, status_code=%v",
 		req.URL,
 		req.Host,
 		string(_body),
@@ -131,6 +135,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		string(_olq),
 		string(_olr),
 		string(headers),
+		statusCode,
 	)
 }
 
