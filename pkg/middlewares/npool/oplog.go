@@ -129,8 +129,8 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		string(_body),
 		buffer.String(),
 		buffer.Len(),
-		_olq,
-		_olr,
+		string(_olq),
+		string(_olr),
 	)
 
 	debug.PrintStack()
