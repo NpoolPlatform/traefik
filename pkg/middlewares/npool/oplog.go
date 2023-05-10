@@ -134,7 +134,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	olr := resp.Result().(*opLogResp)
 	if _, err := uuid.Parse(olr.Info.EntID); err != nil {
-		logger.Warnf("invalid oplog ent_id %v: %v", olr.Info.EntID, err)
+		logger.Warnf("invalid oplog ent_id %v: %v", resp, err)
 		return
 	}
 
