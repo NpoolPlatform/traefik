@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/traefik/traefik/v2/pkg/config/dynamic"
@@ -56,18 +57,19 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ol.name, opLogTypeName))
 
 	type opLogReq struct {
-		EntID       *string
-		AppID       string
-		UserID      *string
-		Path        string
-		Method      string
-		Arguments   string
-		StatusCode  int
-		ReqHeaders  string
-		RespHeaders string
-		NewValue    string
-		Result      *string
-		FailReason  string
+		EntID            *string
+		AppID            string
+		UserID           *string
+		Path             string
+		Method           string
+		Arguments        string
+		StatusCode       int
+		ReqHeaders       string
+		RespHeaders      string
+		NewValue         string
+		Result           *string
+		FailReason       string
+		ElapsedMillisecs uint32
 	}
 
 	olq := &opLogReq{
@@ -124,6 +126,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	buffer := bytes.NewBuffer(nil)
 	_rw := newMultiWriter(buffer, rw)
 
+	start := time.Now()
 	ol.next.ServeHTTP(_rw, req)
 
 	if resp == nil {
@@ -149,12 +152,13 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	olq = &opLogReq{
-		EntID:       &olr.Info.EntID,
-		NewValue:    buffer.String(),
-		StatusCode:  statusCode,
-		ReqHeaders:  string(reqHeaders),
-		RespHeaders: string(respHeaders),
-		Result:      &result,
+		EntID:            &olr.Info.EntID,
+		NewValue:         buffer.String(),
+		StatusCode:       statusCode,
+		ReqHeaders:       string(reqHeaders),
+		RespHeaders:      string(respHeaders),
+		Result:           &result,
+		ElapsedMillisecs: uint32(time.Since(start).Milliseconds()),
 	}
 
 	if statusCode != http.StatusOK {
