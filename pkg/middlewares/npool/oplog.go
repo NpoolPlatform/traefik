@@ -142,11 +142,8 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	respHeaders, _ := json.Marshal(_rw.Header())
 	reqHeaders, _ = json.Marshal(req.Header)
-	statusCode := http.StatusOK
+	statusCode := _rw.StatusCode()
 	result := "Success"
-	if req.Response != nil {
-		statusCode = req.Response.StatusCode
-	}
 	if statusCode != http.StatusOK {
 		result = "Fail"
 	}
@@ -175,11 +172,12 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 type multiWriter struct {
-	rw    http.ResponseWriter
-	multi io.Writer
+	rw         http.ResponseWriter
+	multi      io.Writer
+	statusCode int
 }
 
-func newMultiWriter(buffer *bytes.Buffer, rw http.ResponseWriter) http.ResponseWriter {
+func newMultiWriter(buffer *bytes.Buffer, rw http.ResponseWriter) *multiWriter {
 	multi := io.MultiWriter(buffer, rw)
 	return &multiWriter{
 		rw:    rw,
@@ -196,5 +194,10 @@ func (mw *multiWriter) Write(b []byte) (int, error) {
 }
 
 func (mw *multiWriter) WriteHeader(statusCode int) {
+	mw.statusCode = statusCode
 	mw.rw.WriteHeader(statusCode)
+}
+
+func (mw *multiWriter) StatusCode() int {
+	return mw.statusCode
 }
