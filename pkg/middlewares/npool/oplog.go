@@ -134,6 +134,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	start1 := time.Now()
 	olr := resp.Result().(*opLogResp)
 	if _, err := uuid.Parse(olr.Info.EntID); err != nil {
 		logger.Warnf("invalid oplog ent_id %v: %v", resp, err)
@@ -162,13 +163,13 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		olq.FailReason = buffer.String()
 	}
 
-	resp, err = resty.
+	_, err = resty.
 		New().
 		R().
 		SetBody(olq).
 		SetResult(&opLogResp{}).
 		Post(fmt.Sprintf("http://%v/v1/update/oplog", opLogHost))
-	logger.Debugf("update oplog: %v (%v)", resp, err)
+	logger.Infof("update oplog: %v (%v), elapsed %v", req.URL, err, time.Since(start1).Milliseconds())
 }
 
 type multiWriter struct {
