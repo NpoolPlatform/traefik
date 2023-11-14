@@ -57,6 +57,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ol.name, opLogTypeName))
 
 	type opLogReq struct {
+		ID               *uint32
 		EntID            *string
 		AppID            string
 		UserID           *string
@@ -105,6 +106,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	olq.ReqHeaders = string(reqHeaders)
 
 	type opLogInfo struct {
+		ID    uint32
 		EntID string
 	}
 	type opLogResp struct {
@@ -150,6 +152,7 @@ func (ol *opLog) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	olq = &opLogReq{
+		ID:               &olr.Info.ID,
 		EntID:            &olr.Info.EntID,
 		NewValue:         buffer.String(),
 		StatusCode:       statusCode,
