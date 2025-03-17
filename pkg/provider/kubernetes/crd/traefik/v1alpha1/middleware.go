@@ -48,6 +48,7 @@ type MiddlewareSpec struct {
 	HeadersToBody     *dynamic.HeadersToBody         `json:"headersToBody,omitempty"`
 	OpLog             *dynamic.OpLog                 `json:"opLog,omitempty"`
 	RBACAuth          *dynamic.RBACAuth              `json:"rbacAuth,omitempty"`
+	Billing           *dynamic.Billing               `json:"billing,omitempty"`
 	Plugin            map[string]apiextensionv1.JSON `json:"plugin,omitempty"`
 }
 

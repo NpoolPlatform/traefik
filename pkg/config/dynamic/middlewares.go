@@ -40,6 +40,7 @@ type Middleware struct {
 	HeadersToBody     *HeadersToBody     `json:"headersToBody,omitempty" toml:"headersToBody,omitempty" yaml:"headersToBody,omitempty" export:"true"`
 	OpLog             *OpLog             `json:"opLog,omitempty" toml:"opLog,omitempty" yaml:"opLog,omitempty" export:"true"`
 	RBACAuth          *RBACAuth          `json:"rbacAuth,omitempty" toml:"rbacAuth,omitempty" yaml:"rbacAuth,omitempty" export: "true"`
+	Billing           *Billing           `json:"billing,omitempty" toml:"rbacAuth,omitempty" yaml:"rbacAuth,omitempty" export: "true"`
 
 	Plugin map[string]PluginConf `json:"plugin,omitempty" toml:"plugin,omitempty" yaml:"plugin,omitempty" export:"true"`
 }
@@ -527,5 +528,10 @@ type OpLog struct {
 
 // RBACAuth holds the RBACAuth configuration.
 type RBACAuth struct {
+	HeaderNames []string `json:"headerNames,omitempty" toml:"headerNames,omitempty" yaml:"headerNames,omitempty" export:"true"`
+}
+
+// Billing holds the RBACAuth configuration.
+type Billing struct {
 	HeaderNames []string `json:"headerNames,omitempty" toml:"headerNames,omitempty" yaml:"headerNames,omitempty" export:"true"`
 }

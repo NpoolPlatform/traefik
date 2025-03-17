@@ -742,6 +742,11 @@ func (in *MiddlewareSpec) DeepCopyInto(out *MiddlewareSpec) {
 		*out = new(dynamic.RBACAuth)
 		**out = **in
 	}
+	if in.Billing != nil {
+		in, out := &in.Billing, &out.Billing
+		*out = new(dynamic.Billing)
+		**out = **in
+	}
 	if in.Plugin != nil {
 		in, out := &in.Plugin, &out.Plugin
 		*out = make(map[string]v1.JSON, len(*in))

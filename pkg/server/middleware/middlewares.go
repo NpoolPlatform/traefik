@@ -374,6 +374,17 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 		}
 	}
 
+	// Billing
+	if config.Billing != nil {
+		if middleware != nil {
+			return nil, badConf
+		}
+
+		middleware = func(next http.Handler) (http.Handler, error) {
+			return npool.NewBilling(ctx, next, *config.Billing, middlewareName)
+		}
+	}
+
 	// Plugin
 	if config.Plugin != nil {
 		if middleware != nil {
